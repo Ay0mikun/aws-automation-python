@@ -1,8 +1,23 @@
+#!/usr/bin/python
+#-*- coding: utf-8 -*-
+"""Webotron: Deploy websites with aws
+
+Webotron automates the process of deploying static websites to AWS.
+- Configure AWS S3 buckets
+  - Create them
+  - Set them up for static website hosting
+  - Deploy local files to them
+- Configure DNS with AWS Route53
+- Configure a Content Delivery Network and SSL with AWS CloudFront
+"""
+
+from pathlib import Path
+import mimetypes
+
 import boto3
 from botocore.exceptions import ClientError
 import click
-from pathlib import Path
-import mimetypes
+
 
 
 session = boto3.Session(profile_name='pythonAutomation')
@@ -11,13 +26,13 @@ s3 = session.resource('s3')
 
 @click.group()
 def cli():
-    "Webotron deploys websites to AWS"
+    """Webotron deploys websites to AWS"""
     pass
 
 
 @cli.command('list-buckets')
 def list_buckets():
-    "List all s3 buckets"
+    """List all s3 buckets"""
     for bucket in s3.buckets.all():
         print(bucket)
 
@@ -25,7 +40,7 @@ def list_buckets():
 @cli.command('list-bucket-objects')
 @click.argument('bucket-name')
 def list_bucket_objects(bucket_name):
-    "List objects in an s3 bucket"
+    """List objects in an s3 bucket"""
     for obj in s3.Bucket(bucket_name).objects.all():
         print(obj)
 
@@ -33,7 +48,7 @@ def list_bucket_objects(bucket_name):
 @cli.command('setup-bucket')
 @click.argument('bucket-name')
 def setup_bucket(bucket_name):
-    "Create and configure an S3 bucket"
+    """Create and configure an S3 bucket"""
     s3_bucket = None
 
     try:
@@ -84,7 +99,7 @@ def upload_file(s3_bucket, path, key):
 @click.argument('pathname', type=click.Path(exists=True))
 @click.argument('bucket_name')
 def sync(pathname, bucket_name):
-    "Sync contents of PATHNAME to BUCKET"
+    """Sync contents of PATHNAME to BUCKET"""
     s3_bucket = s3.Bucket(bucket_name)
     root = Path(pathname).expanduser().resolve()
 
